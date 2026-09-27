@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>理科アプリ ポータルサイト</title>
+    <!-- Tailwind CSSの読み込み（デザイン用） -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fontsの読み込み（見やすいフォント） -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            background-color: #f8fafc; /* 薄いグレーの背景 */
+        }
+        /* スムーズなアニメーション用 */
+        .card-enter {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        /* スクロールバーのカスタマイズ */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
+    </style>
+</head>
+<body class="text-slate-800">
+
+    <header class="bg-white shadow-sm sticky top-0 z-10">
+        <div class="max-w-5xl mx-auto px-4 py-6">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <h1 class="text-2xl font-bold text-blue-700 flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                        </svg>
+                        理科ツールボックス
+                    </h1>
+                    <p class="text-sm text-slate-500 mt-1">使いたいアプリを選んで学習を始めよう！</p>
+                </div>
+                
+                <!-- 検索ボックス -->
+                <div class="relative w-full md:w-80">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <svg class="h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                    </div>
+                    <input type="text" id="searchInput" placeholder="キーワードでさがす (例: 電流, 密度)" 
+                        class="block w-full pl-10 pr-3 py-3 border border-slate-300 rounded-xl leading-5 bg-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg transition-shadow">
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto px-4 py-8">
+        <!-- タブ切り替え（学年フィルター） -->
+        <div class="flex flex-wrap gap-2 mb-8" id="tabContainer">
+            <!-- JavaScriptでタブが生成されます -->
+        </div>
+
+        <!-- アプリ一覧を表示するグリッド -->
+        <div id="appGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- JavaScriptでカードが生成されます -->
+        </div>
+
+        <!-- 検索結果がゼロの時のメッセージ -->
+        <div id="noResults" class="hidden text-center py-12">
+            <svg class="mx-auto h-16 w-16 text-slate-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <h3 class="text-lg font-medium text-slate-900">見つかりませんでした</h3>
+            <p class="text-slate-500 mt-1">別のキーワードを試すか、学年のタブを「すべて」にしてみてください。</p>
+        </div>
+    </main>
+
+    <script>
+        // ==========================================
+        // 先生用設定エリア：ここにアプリのデータを追加・編集します
+        // ==========================================
+        const appData = [
+            {
+                id: "app10",
+                grade: "2年",
+                title: "物質の分類分けペアマッチ",
+                description: "「物質の分類」を、神経衰弱ゲームの感覚で楽しく学べる教育用ウェブアプリ",
+                tags: ["ぶっしつ", "分類", "単体", "化合物", "混合物", "神経衰弱", "ゲーム", "ペアマッチ"],
+                url: "https://rickcrick2004-hue.github.io/substance-classifier-edu/",
+                icon: "🃏",
+                color: "bg-blue-100 text-blue-800"
+            },
+            {
+                id: "app11",
+                grade: "2年",
+                title: "化学式ペアマッチ",
+                description: "化学式と物質名をペアで消していくゲーム感覚のアプリ。化学式の暗記に最適！",
+                tags: ["化学式", "物質名", "ペアマッチ", "ゲーム", "暗記", "かがくしき", "ぶっしつめい", "パズル"],
+                url: "https://rickcrick2004-hue.github.io/edu-chemical-formula-drill/",
+                icon: "🧩",
+                color: "bg-blue-100 text-blue-800"
+            },
+            {
+                id: "app12",
+                grade: "2年, 3年",
+                title: "元素記号と原子番号ペアマッチ",
+                description: "1〜20番の原子番号と元素記号（H〜Ca）をゲーム感覚でマスターできる教育用ウェブアプリです。",
+                tags: ["元素記号", "原子番号", "化学", "ペアマッチ", "ゲーム", "暗記", "げんそきごう", "げんし"],
+                url: "https://rickcrick2004-hue.github.io/chemistry-pair-match-edu/",
+                icon: "⚛️",
+                color: "bg-indigo-100 text-indigo-800"
+            },
+
+            // --- 3年生 ---
+            {
+                id: "app13",
+                grade: "3年",
+                title: "電子配置マスター",
+                description: "中心の原子核（陽子数）と周囲の電子の配置を見て、それが何の原子・イオンかを当てる学習アプリです。",
+                tags: ["電子配置", "原子核", "陽子", "電子", "イオン", "原子", "でんしはいち", "クイズ", "ゲーム"],
+                url: "https://rickcrick2004-hue.github.io/electron-configuration-quiz/",
+                icon: "🎯",
+                color: "bg-purple-100 text-purple-800"
+            },
+            // --- ここから追加分 ---
+            {
+                id: "app14",
+                grade: "2年",
+                title: "中2化学元素記号・化学式マスター",
+                description: "元素記号・化学式・物質の分類を「フラッシュカード」と「キーボード入力」の2モードで効率よくマスターできるアプリです。",
+                tags: ["元素記号", "化学式", "物質の分類", "フラッシュカード", "タイピング", "暗記", "かがくしき", "げんそきごう"],
+                url: "https://rickcrick2004-hue.github.io/gensokigou-kagakusiki-master/",
+                icon: "⌨️",
+                color: "bg-blue-100 text-blue-800"
+            },
+            {
+                id: "app15",
+                grade: "2年, 3年",
+                title: "元素マッチング",
+                description: "原子番号1〜20までの元素を神経衰弱のようなマッチングゲームで楽しく覚えられるアプリ。「番号と記号」など3つのモードでタイムを競おう！",
+                tags: ["元素", "原子番号", "元素名", "マッチング", "神経衰弱", "ゲーム", "タイムアタック", "げんそ"],
+                url: "https://rickcrick2004-hue.github.io/study-chemistry-match/",
+                icon: "🎴",
+                color: "bg-indigo-100 text-indigo-800"
+            },
+            // --- ここから追加分 ---
+            {
+                id: "app16",
+                grade: "2年",
+                title: "電流・電圧マスターアプリ",
+                description: "直列・並列回路の電流・電圧を計算する問題がランダムに自動生成されます。オームの法則のマスターや総合テストに最適！",
+                tags: ["電流", "電圧", "オームの法則", "直列", "並列", "回路", "計算", "でんりゅう", "でんあつ", "かいろ"],
+                url: "https://rickcrick2004-hue.github.io/electric-circuit-learning-app/",
+                icon: "🔋",
+                color: "bg-blue-100 text-blue-800"
+            },
+            {
+                id: "app17",
+                grade: "2年",
+                title: "電流計・電圧計読み取りマスター",
+                description: "端子に応じた目盛りの読み方や、「最小目盛りの1/10まで読む」というルールをヒント付きで反復練習できます。",
+                tags: ["電流計", "電圧計", "目盛り", "読み取り", "電気", "でんりゅうけい", "でんあつけい", "めもり"],
+                url: "https://rickcrick2004-hue.github.io/ammeter-voltmeter-practice/",
+                icon: "🎛️",
+                color: "bg-blue-100 text-blue-800"
+            },
+            {
+                id: "app18",
+                grade: "1年, 2年, 3年",
+                title: "中1理科復習アプリ",
+                description: "中1理科の全範囲を網羅した自学自習アプリ。反復学習可能なフラッシュカードや赤シート機能、進化していく育成ゲーム要素を搭載しています。",
+                tags: ["復習", "重要語句", "計算", "フラッシュカード", "赤シート", "ランダムテスト", "ふくしゅう", "暗記"],
+                url: "https://rickcrick2004-hue.github.io/chuu-1-rika-fukushuu-app/",
+                icon: "🐉",
+                color: "bg-emerald-100 text-emerald-800"
+            },
+            {
+                id: "app19",
+                grade: "2年, 3年",
+                title: "中2理科復習アプリ",
+                description: "中2理科の重要語句や化学反応式、計算問題を確実に定着させる自学自習アプリ。間違えた問題を繰り返し出題するフラッシュカード機能を搭載しています。",
+                tags: ["復習", "重要語句", "化学反応式", "計算", "フラッシュカード", "暗記", "ふくしゅう", "自学自習"],
+                url: "https://rickcrick2004-hue.github.io/chuu-2-rika-fukushuu/",
+                icon: "🦁",
+                color: "bg-blue-100 text-blue-800"
+            },
+            {
+                id: "app20",
+                grade: "3年",
+                title: "力の合成・分解マスター",
+                description: "「力の合成と分解」を直感的に学べるシミュレーションツール。矢印のドラッグ操作や斜面上の重力分解、作図のステップガイドも搭載！",
+                tags: ["力", "合成", "分解", "平行四辺形", "作図", "斜面", "重力", "シミュレーション", "ちから", "物理"],
+                url: "https://rickcrick2004-hue.github.io/chikara-gousei-bunnkai/",
+                icon: "📐",
+                color: "bg-purple-100 text-purple-800"
+            },
+            {
+                id: "app21",
+                grade: "3年",
+                title: "AstroMaster - 星の動き完全攻略",
+                description: "日周運動と年周運動を直感的に学べるシミュレーション教材。「1時間に15度」「1ヶ月で30度」の動きや、入試頻出の複雑な問題も視覚的に理解できます！",
+                tags: ["天体", "星", "日周運動", "年周運動", "南の空", "北の空", "シミュレーション", "宇宙", "てんたい", "ほし"],
+                url: "https://rickcrick2004-hue.github.io/tentai-nissyuuunndou-nennsyuuunndou/",
+                icon: "🔭",
+                color: "bg-indigo-100 text-indigo-800"
+            },
+            {
+                id: "app22",
+                grade: "1年",
+                title: "力のはたらきマスター",
+                description: "力の3要素や様々な力（重力、弾性力など）、フックの法則を4択クイズや対戦モードで楽しく学べるアプリ。赤シート機能付き暗記リストも搭載！",
+                tags: ["力", "重力", "弾性力", "摩擦力", "垂直抗力", "フックの法則", "力の3要素", "二力のつり合い", "クイズ", "対戦", "ちから"],
+                url: "https://rickcrick2004-hue.github.io/edu-science-forces-master/",
+                icon: "🍎",
+                color: "bg-emerald-100 text-emerald-800"
+            },
+            {
+                id: "app23",
+                grade: "2年",
+                title: "中2理科：電気マスターver.1",
+                description: "中2「電気分野」の重要語句や公式（オームの法則・磁界など）を楽しく学べるアプリ。早押し対戦モードや赤シート暗記機能も搭載！",
+                tags: ["電気", "オームの法則", "回路", "磁界", "静電気", "クイズ", "対戦", "暗記", "でんき", "物理"],
+                url: "https://rickcrick2004-hue.github.io/edu-jh-physics-electricity/",
+                icon: "⚡",
+                color: "bg-blue-100 text-blue-800"
+            },
+            {
+                id: "app24",
+                grade: "1年",
+                title: "植物分類マスター",
+                description: "中1「植物の分類」を楽しく学べる4択クイズアプリ。3つの難易度モードや白熱の対戦モード、赤シート付きの用語リストを搭載し、飽きずに反復学習できます！",
+                tags: ["植物", "分類", "生物", "クイズ", "対戦", "暗記", "種子植物", "シダ植物", "コケ植物", "しょくぶつ"],
+                url: "https://rickcrick2004-hue.github.io/edu-science-plants/",
+                icon: "🌿",
+                color: "bg-emerald-100 text-emerald-800"
+            },
+            {
+                id: "app25",
+                grade: "3年",
+                title: "中学理科 4択タイムアタック",
+                description: "全分野（生物・化学・物理・地学）の重要語句200問を収録した4択クイズアプリ。タイムアタックや「1ミスで即終了」などのスリルあるモードで、入試前の総復習をゲーム感覚で楽しめます！",
+                tags: ["クイズ", "タイムアタック", "総復習", "全範囲", "入試", "生物", "化学", "物理", "地学", "ゲーム"],
+                url: "https://rickcrick2004-hue.github.io/edu-rika-timeattack/",
+                icon: "⏳",
+                color: "bg-purple-100 text-purple-800"
+            }
+        ];
+
+        // タブの定義
+        const tabs = ["すべて", "1年", "2年", "3年", "その他"];
+
+        // ==========================================
+        // ここから下はシステムの動作プログラムです（変更不要）
+        // ==========================================
+
+        let currentFilter = "すべて";
+        let currentSearchQuery = "";
+
+        const appGrid = document.getElementById('appGrid');
+        const noResults = document.getElementById('noResults');
+        const searchInput = document.getElementById('searchInput');
+        const tabContainer = document.getElementById('tabContainer');
+
+        // タブを描画する関数
+        function renderTabs() {
+            tabContainer.innerHTML = '';
+            tabs.forEach(tab => {
+                const btn = document.createElement('button');
+                btn.textContent = tab;
+                
+                // タブレットで押しやすいように padding (px-6 py-3) を大きめに設定
+                btn.className = `px-6 py-3 rounded-full text-base font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
+                    currentFilter === tab 
+                        ? 'bg-blue-600 text-white shadow-md' 
+                        : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
+                }`;
+                
+                btn.addEventListener('click', () => {
+                    currentFilter = tab;
+                    renderTabs(); // タブの見た目（アクティブ状態）を更新
+                    renderApps(); // アプリ一覧を再描画
+                });
+                tabContainer.appendChild(btn);
+            });
+        }
+
+        // アプリ一覧を描画する関数
+        function renderApps() {
+            appGrid.innerHTML = ''; // 一旦クリア
+            let visibleCount = 0;
+
+            const query = currentSearchQuery.toLowerCase();
+
+            appData.forEach((app, index) => {
+                // 1. 学年フィルターの判定（複数学年にも対応できるように変更）
+                const matchGrade = currentFilter === "すべて" || app.grade.includes(currentFilter);
+                
+                // 2. 検索キーワードの判定（タイトル、説明、タグから検索）
+                const searchTargetText = (app.title + " " + app.description + " " + app.tags.join(" ")).toLowerCase();
+                const matchSearch = searchTargetText.includes(query);
+
+                // 両方の条件を満たせば表示
+                if (matchGrade && matchSearch) {
+                    visibleCount++;
+                    const card = document.createElement('a');
+                    card.href = app.url;
+                    
+                    // 別タブで開くように設定（プレビューでのエラーを防ぎ、生徒も使いやすくなります）
+                    card.target = "_blank"; 
+                    // セキュリティ対策（別タブを開く際の推奨設定）
+                    card.rel = "noopener noreferrer";
+
+                    // カードのデザイン（タブレットで押しやすい大きなクリック領域）
+                    card.className = `block bg-white rounded-2xl shadow-sm border border-slate-200 p-6 hover:shadow-lg hover:border-blue-300 transition-all duration-200 cursor-pointer card-enter group outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`;
+                    // アニメーションを少しずつずらす
+                    card.style.animationDelay = `${index * 0.05}s`;
+
+                    card.innerHTML = `
+                        <div class="flex items-start gap-4 h-full flex-col">
+                            <div class="flex items-center gap-3 w-full">
+                                <div class="text-4xl group-hover:scale-110 transition-transform">${app.icon}</div>
+                                <div>
+                                    <span class="inline-block px-2.5 py-1 rounded-md text-xs font-bold mb-2 ${app.color}">${app.grade}</span>
+                                    <h2 class="text-xl font-bold text-slate-800 leading-tight group-hover:text-blue-600 transition-colors">${app.title}</h2>
+                                </div>
+                            </div>
+                            <p class="text-slate-600 text-sm leading-relaxed mt-2 flex-grow">${app.description}</p>
+                            
+                            <!-- 関連タグの表示（生徒が見て、どういう単語で検索できるか分かるようにする） -->
+                            <div class="flex flex-wrap gap-1 mt-3">
+                                ${app.tags.slice(0, 3).map(tag => `<span class="text-xs text-slate-400 bg-slate-50 px-2 py-1 rounded-full border border-slate-100">#${tag}</span>`).join('')}
+                                ${app.tags.length > 3 ? `<span class="text-xs text-slate-400">...</span>` : ''}
+                            </div>
+                        </div>
+                    `;
+                    appGrid.appendChild(card);
+                }
+            });
+
+            // 検索結果が0件の場合の処理
+            if (visibleCount === 0) {
+                noResults.classList.remove('hidden');
+            } else {
+                noResults.classList.add('hidden');
+            }
+        }
+
+        // 検索ボックスの入力イベント（文字を打つたびにリアルタイムで絞り込み）
+        searchInput.addEventListener('input', (e) => {
+            currentSearchQuery = e.target.value;
+            renderApps();
+        });
+
+        // ページ読み込み時の初期化
+        document.addEventListener('DOMContentLoaded', () => {
+            renderTabs();
+            renderApps();
+        });
+
+    </script>
+</body>
+</html>
