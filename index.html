@@ -72,8 +72,8 @@
             <!-- JavaScriptでタブが生成されます -->
         </div>
 
-        <!-- アプリ一覧を表示するグリッド -->
-        <div id="appGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- アプリ一覧を表示するコンテナ（分野ごとに表示） -->
+        <div id="appContainer" class="flex flex-col">
             <!-- JavaScriptでカードが生成されます -->
         </div>
 
@@ -610,6 +610,61 @@
                 url: "https://rickcrick2004-hue.github.io/science-ion-simulator/",
                 icon: "⚛️",
                 color: "bg-purple-100 text-purple-800"
+            },
+            {
+                id: "app60",
+                grade: "3年",
+                field: "化学",
+                title: "中和シミュレーター",
+                description: "酸とアルカリを混ぜ合わせたときの中和反応を視覚的に学べるシミュレーター。イオンの数の変化や水分子ができる様子をアニメーションで確認できます。",
+                tags: ["化学", "中和", "酸", "アルカリ", "イオン", "シミュレーション"],
+                url: "https://rickcrick2004-hue.github.io/neutralization-simulator/",
+                icon: "🧪",
+                color: "bg-purple-100 text-purple-800"
+            },
+            {
+                id: "app61",
+                grade: "3年",
+                field: "化学",
+                title: "電離シミュレーター",
+                description: "電解質が水に溶けて陽イオンと陰イオンに分かれる「電離」の様子を観察できるシミュレーター。塩化ナトリウムや塩化銅などの電離を直感的に理解しよう！",
+                tags: ["化学", "電離", "イオン", "電解質", "水溶液", "シミュレーション"],
+                url: "https://rickcrick2004-hue.github.io/ionization-simulator/",
+                icon: "⚡",
+                color: "bg-purple-100 text-purple-800"
+            },
+            {
+                id: "app62",
+                grade: "3年",
+                field: "化学",
+                title: "酸・アルカリインタラクティブボード",
+                description: "酸性とアルカリ性の性質や、代表的な水溶液（塩酸、水酸化ナトリウム水溶液など）の特徴をまとめた学習ボード。指示薬の色の変化も確認できます。",
+                tags: ["化学", "酸", "アルカリ", "水溶液", "指示薬", "まとめ"],
+                url: "https://rickcrick2004-hue.github.io/cid-alkali-interactive-board/",
+                icon: "📊",
+                color: "bg-purple-100 text-purple-800"
+            },
+            {
+                id: "app63",
+                grade: "その他",
+                field: "パズル・ゲーム",
+                title: "ハノイの塔",
+                description: "論理的思考力を鍛える古典的パズル「ハノイの塔」。ルールに従って円盤を移動させ、最小手数でのクリアを目指そう！息抜きや脳トレに最適です。",
+                tags: ["パズル", "ゲーム", "論理的思考", "脳トレ", "ハノイの塔"],
+                url: "https://rickcrick2004-hue.github.io/hanoi-tower-edu/",
+                icon: "🗼",
+                color: "bg-orange-100 text-orange-800"
+            },
+            {
+                id: "app64",
+                grade: "その他",
+                field: "パズル・ゲーム",
+                title: "夜の橋渡りパズル",
+                description: "歩く速さが違う4人が、1つのライトを使って制限時間内に橋を渡りきる論理パズル。柔軟な発想とプログラミング的思考が試されます。",
+                tags: ["パズル", "ゲーム", "論理的思考", "脳トレ", "プログラミング的思考"],
+                url: "https://rickcrick2004-hue.github.io/night-bridge-puzzle-16bit/",
+                icon: "🌉",
+                color: "bg-orange-100 text-orange-800"
             }
         ];
 
@@ -624,10 +679,9 @@
         let currentSearchQuery = "";
         let isTeacherUnlocked = false; // 先生用ロック解除フラグ
 
-        const appGrid = document.getElementById('appGrid');
+        const appContainer = document.getElementById('appContainer');
         const noResults = document.getElementById('noResults');
         const searchInput = document.getElementById('searchInput');
-        const tabContainer = document.getElementById('tabContainer');
         
         // パスワードモーダル用要素
         const passwordModal = document.getElementById('passwordModal');
@@ -701,12 +755,30 @@
 
         // アプリ一覧を描画する関数
         function renderApps() {
-            appGrid.innerHTML = ''; // 一旦クリア
+            appContainer.innerHTML = ''; // 一旦クリア
             let visibleCount = 0;
 
             const query = currentSearchQuery.toLowerCase();
+            
+            // 分野ごとにアプリを分類
+            const groupedApps = {};
+            // 表示する分野の順番
+            const fieldOrder = ["物理", "化学", "生物", "地学", "総合", "便利ツール", "パズル・ゲーム", "先生用ツール"];
 
             appData.forEach((app, index) => {
+                // 分野の自動判定（fieldが未設定の場合）
+                let field = app.field;
+                if (!field) {
+                    if (app.tags.some(t => ["物理", "力", "電気", "光", "音", "電流", "オームの法則", "回路"].includes(t))) field = "物理";
+                    else if (app.tags.some(t => ["化学", "物質", "化学式", "イオン", "濃度", "元素記号", "水溶液"].includes(t))) field = "化学";
+                    else if (app.tags.some(t => ["生物", "植物", "消化", "人体"].includes(t))) field = "生物";
+                    else if (app.tags.some(t => ["地学", "天体", "火山", "地層", "地震", "宇宙"].includes(t))) field = "地学";
+                    else if (app.grade === "先生用") field = "先生用ツール";
+                    else if (app.grade === "その他") field = "便利ツール";
+                    else field = "総合";
+                    app.field = field; // キャッシュ
+                }
+
                 // 1. 学年フィルターの判定（「すべて」の時は「先生用」を非表示にする）
                 let matchGrade = false;
                 if (currentFilter === "すべて") {
@@ -719,41 +791,69 @@
                 const searchTargetText = (app.title + " " + app.description + " " + app.tags.join(" ")).toLowerCase();
                 const matchSearch = searchTargetText.includes(query);
 
-                // 両方の条件を満たせば表示
+                // 両方の条件を満たせば表示リストに追加
                 if (matchGrade && matchSearch) {
+                    if (!groupedApps[field]) {
+                        groupedApps[field] = [];
+                    }
+                    app.originalIndex = index; // アニメーションの遅延計算用
+                    groupedApps[field].push(app);
                     visibleCount++;
-                    const card = document.createElement('a');
-                    card.href = app.url;
+                }
+            });
+
+            // 分野ごとにセクションを作成して描画
+            fieldOrder.forEach(field => {
+                if (groupedApps[field] && groupedApps[field].length > 0) {
+                    // 分野見出し
+                    const sectionHeader = document.createElement('h2');
+                    sectionHeader.className = "text-xl font-bold text-slate-700 border-b-2 border-slate-200 pb-2 mt-6 mb-4 flex items-center gap-2";
                     
-                    // 別タブで開くように設定（プレビューでのエラーを防ぎ、生徒も使いやすくなります）
-                    card.target = "_blank"; 
-                    // セキュリティ対策（別タブを開く際の推奨設定）
-                    card.rel = "noopener noreferrer";
+                    let icon = "📂";
+                    if(field === "物理") icon = "🍎";
+                    if(field === "化学") icon = "🧪";
+                    if(field === "生物") icon = "🌿";
+                    if(field === "地学") icon = "🌋";
+                    if(field === "総合") icon = "📚";
+                    if(field === "便利ツール") icon = "🛠️";
+                    if(field === "パズル・ゲーム") icon = "🧩";
+                    if(field === "先生用ツール") icon = "👨‍🏫";
+                    
+                    sectionHeader.innerHTML = `<span>${icon}</span> ${field}`;
+                    appContainer.appendChild(sectionHeader);
 
-                    // カードのデザイン（タブレットで押しやすい大きなクリック領域）
-                    card.className = `block bg-white rounded-2xl shadow-sm border border-slate-200 p-6 hover:shadow-lg hover:border-blue-300 transition-all duration-200 cursor-pointer card-enter group outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`;
-                    // アニメーションを少しずつずらす
-                    card.style.animationDelay = `${index * 0.05}s`;
+                    // グリッド
+                    const grid = document.createElement('div');
+                    grid.className = "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8";
 
-                    card.innerHTML = `
-                        <div class="flex items-start gap-4 h-full flex-col">
-                            <div class="flex items-center gap-3 w-full">
-                                <div class="text-4xl group-hover:scale-110 transition-transform">${app.icon}</div>
-                                <div>
-                                    <span class="inline-block px-2.5 py-1 rounded-md text-xs font-bold mb-2 ${app.color}">${app.grade}</span>
-                                    <h2 class="text-xl font-bold text-slate-800 leading-tight group-hover:text-blue-600 transition-colors">${app.title}</h2>
+                    groupedApps[field].forEach((app, i) => {
+                        const card = document.createElement('a');
+                        card.href = app.url;
+                        card.target = "_blank"; 
+                        card.rel = "noopener noreferrer";
+                        card.className = `block bg-white rounded-2xl shadow-sm border border-slate-200 p-6 hover:shadow-lg hover:border-blue-300 transition-all duration-200 cursor-pointer card-enter group outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`;
+                        card.style.animationDelay = `${i * 0.05}s`;
+
+                        card.innerHTML = `
+                            <div class="flex items-start gap-4 h-full flex-col">
+                                <div class="flex items-center gap-3 w-full">
+                                    <div class="text-4xl group-hover:scale-110 transition-transform">${app.icon}</div>
+                                    <div>
+                                        <span class="inline-block px-2.5 py-1 rounded-md text-xs font-bold mb-2 ${app.color}">${app.grade}</span>
+                                        <h2 class="text-xl font-bold text-slate-800 leading-tight group-hover:text-blue-600 transition-colors">${app.title}</h2>
+                                    </div>
+                                </div>
+                                <p class="text-slate-600 text-sm leading-relaxed mt-2 flex-grow">${app.description}</p>
+                                <div class="flex flex-wrap gap-1 mt-3">
+                                    ${app.tags.slice(0, 3).map(tag => `<span class="text-xs text-slate-400 bg-slate-50 px-2 py-1 rounded-full border border-slate-100">#${tag}</span>`).join('')}
+                                    ${app.tags.length > 3 ? `<span class="text-xs text-slate-400">...</span>` : ''}
                                 </div>
                             </div>
-                            <p class="text-slate-600 text-sm leading-relaxed mt-2 flex-grow">${app.description}</p>
-                            
-                            <!-- 関連タグの表示（生徒が見て、どういう単語で検索できるか分かるようにする） -->
-                            <div class="flex flex-wrap gap-1 mt-3">
-                                ${app.tags.slice(0, 3).map(tag => `<span class="text-xs text-slate-400 bg-slate-50 px-2 py-1 rounded-full border border-slate-100">#${tag}</span>`).join('')}
-                                ${app.tags.length > 3 ? `<span class="text-xs text-slate-400">...</span>` : ''}
-                            </div>
-                        </div>
-                    `;
-                    appGrid.appendChild(card);
+                        `;
+                        grid.appendChild(card);
+                    });
+                    
+                    appContainer.appendChild(grid);
                 }
             });
 
